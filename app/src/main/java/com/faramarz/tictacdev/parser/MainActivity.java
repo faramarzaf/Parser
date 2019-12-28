@@ -25,15 +25,13 @@ import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private String TAG = MainActivity.class.getSimpleName();
-
-    private TextView txtResponse, txtResponseFromUrl;
+    private TextView txtResponse;
     private Button btnParse;
     private ProgressDialog pDialog;
-    private ListView lv;
+    private ListView listView;
     private ListAdapter adapter;
     public static String url = "https://api.androidhive.info/contacts/";
     private ArrayList<HashMap<String, String>> contactList;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,15 +41,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnParse.setOnClickListener(this);
         contactList = new ArrayList<>();
         parse();
-
     }
 
     private void bind() {
         txtResponse = findViewById(R.id.txtResponse);
         btnParse = findViewById(R.id.btnParse);
-        txtResponseFromUrl = findViewById(R.id.txtResponseFromUrl);
-        lv = findViewById(R.id.list);
-
+        listView = findViewById(R.id.list);
     }
 
     private HashMap<String, Object> getHashMapFromJson(String json) throws JSONException {
@@ -76,12 +71,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
     @Override
     public void onClick(View v) {
         new GetContacts().execute();
     }
-
 
     /**
      * Async task class to get json by making HTTP call
@@ -102,17 +95,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected Void doInBackground(Void... arg0) {
             HttpHandler sh = new HttpHandler();
-
             // Making a request to url and getting response
             String jsonStr = sh.makeServiceCall(url);
             Log.e(TAG, "Response from url: " + jsonStr);
-
             if (jsonStr != null) {
                 try {
                     JSONObject jsonObj = new JSONObject(jsonStr);
                     // Getting JSON Array node
                     JSONArray contacts = jsonObj.getJSONArray("contacts");
-
                     // looping through All Contacts
                     for (int i = 0; i < contacts.length(); i++) {
                         JSONObject c = contacts.getJSONObject(i);
@@ -121,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         String email = c.getString("email");
                         String address = c.getString("address");
                         String gender = c.getString("gender");
-
 
                         // Phone node is JSON Object
                         JSONObject phone = c.getJSONObject("phone");
@@ -160,12 +149,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 "Couldn't get json from server. Check LogCat for possible errors!", Toast.LENGTH_LONG).show();
                     }
                 });
-
             }
-
             return null;
         }
-
 
         @Override
         protected void onPostExecute(Void result) {
@@ -174,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 pDialog.dismiss();
             adapter = new SimpleAdapter(MainActivity.this, contactList, R.layout.list_item, new String[]{"name", "email", "mobile"},
                     new int[]{R.id.name, R.id.email, R.id.mobile});
-            lv.setAdapter(adapter);
+            listView.setAdapter(adapter);
         }
 
     }
